@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SportsTV Streaming Data Warehouse | Ayush Varma</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 60px 0;
+            border-bottom: 1px solid #334155;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .subtitle {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .badge {
+            background: #334155;
+            color: #e2e8f0;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .badge.blue {
+            background: #1d4ed8;
+        }
+
+        .badge.green {
+            background: #059669;
+        }
+
+        .badge.orange {
+            background: #d97706;
+        }
+
+        .badge.purple {
+            background: #7c3aed;
+        }
+
+        .hero-links {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .hero-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .hero-links a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #334155;
+            color: #e2e8f0;
+            border: 1px solid #475569;
+        }
+
+        /* Stats Section */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 50px 0;
+            border-bottom: 1px solid #334155;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border: 1px solid #475569;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #60a5fa;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        /* Section Styles */
+        section {
+            padding: 50px 0;
+            border-bottom: 1px solid #334155;
+        }
+
+        section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: #f1f5f9;
+        }
+
+        /* Architecture Diagram */
+        .architecture {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        .architecture pre {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .architecture .highlight {
+            color: #60a5fa;
+        }
+
+        .architecture .green {
+            color: #34d399;
+        }
+
+        .architecture .yellow {
+            color: #fbbf24;
+        }
+
+        .architecture .purple {
+            color: #a78bfa;
+        }
+
+        /* Schema Tables */
+        .schema-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .schema-card {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border: 1px solid #475569;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .schema-card h3 {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 14px 20px;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .schema-card h3 span {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .schema-card ul {
+            list-style: none;
+            padding: 16px 20px;
+        }
+
+        .schema-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid #334155;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .schema-card li:last-child {
+            border-bottom: none;
+        }
+
+        .schema-card .type {
+            color: #60a5fa;
+            font-size: 0.8rem;
+        }
+
+        /* Data Flow */
+        .data-flow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .flow-card {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border: 1px solid #475569;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .flow-card .icon {
+            font-size: 2rem;
+            margin-bottom: 16px;
+        }
+
+        .flow-card h3 {
+            color: #f1f5f9;
+            margin-bottom: 12px;
+        }
+
+        .flow-card p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .flow-card .metric {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #475569;
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        /* Tech Stack */
+        .tech-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .tech-item {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border: 1px solid #475569;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        /* Features */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border: 1px solid #475569;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .feature-card h3 {
+            color: #f1f5f9;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-card p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        /* Analytics Preview */
+        .analytics-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .analytics-card {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border: 1px solid #475569;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .analytics-card h4 {
+            color: #f1f5f9;
+            margin-bottom: 16px;
+            font-size: 1rem;
+        }
+
+        .analytics-card table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .analytics-card th,
+        .analytics-card td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+            font-size: 0.85rem;
+        }
+
+        .analytics-card th {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .analytics-card td {
+            color: #e2e8f0;
+        }
+
+        .analytics-card .highlight-row {
+            color: #34d399;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 50px 0 30px;
+            color: #64748b;
+        }
+
+        footer a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            color: #94a3b8;
+            transition: color 0.2s;
+        }
+
+        .social-links a:hover {
+            color: #60a5fa;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .architecture pre {
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <span class="hero-badge">📊 Data Warehousing Project</span>
+            <h1>SportsTV Streaming Data Warehouse</h1>
+            <p class="subtitle">
+                A star schema analytics datamart processing 1.18M streaming transactions with ETL pipelines,
+                partitioned fact tables, and business intelligence reporting.
+            </p>
+
+            <div class="badges">
+                <span class="badge blue">MySQL 8.0</span>
+                <span class="badge green">R 4.3+</span>
+                <span class="badge orange">1.18M Records</span>
+                <span class="badge purple">Star Schema</span>
+            </div>
+
+            <div class="hero-links">
+                <a href="https://github.com/ayushvarma7/sportstv-streaming-data-warehouse" class="btn-primary">
+                    ⭐ View on GitHub
+                </a>
+                <a href="https://ayushvarma.notion.site/Practicum-II-2bab9196aa378048bcb5ea818490b739"
+                    class="btn-secondary">
+                    📓 Notion Docs
+                </a>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="number">1.18M</div>
+                <div class="label">Source Transactions</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">97.1%</div>
+                <div class="label">Data Retention</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">~51s</div>
+                <div class="label">ETL Runtime</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">23K/s</div>
+                <div class="label">Processing Speed</div>
+            </div>
+        </div>
+
+        <!-- Architecture Section -->
+        <section>
+            <h2>🏗️ Architecture</h2>
+            <div class="architecture">
+                <pre>
+<span class="yellow">┌─────────────────────────────────────────────────────────────────────────┐</span>
+<span class="yellow">│</span>                        <span class="highlight">DATA SOURCES (EXTRACT)</span>                           <span class="yellow">│</span>
+<span class="yellow">├─────────────────────────────────────────────────────────────────────────┤</span>
+<span class="yellow">│</span>  ┌──────────────────────┐         ┌──────────────────────┐              <span class="yellow">│</span>
+<span class="yellow">│</span>  │   <span class="green">SQLite Database</span>    │         │      <span class="green">CSV Export</span>      │              <span class="yellow">│</span>
+<span class="yellow">│</span>  │   subscribersDB      │         │  new-streaming-txns  │              <span class="yellow">│</span>
+<span class="yellow">│</span>  │   <span class="purple">1,083,131 records</span>  │         │    <span class="purple">98,732 records</span>    │              <span class="yellow">│</span>
+<span class="yellow">│</span>  └──────────┬───────────┘         └──────────┬───────────┘              <span class="yellow">│</span>
+<span class="yellow">└─────────────┼────────────────────────────────┼──────────────────────────┘</span>
+              │                                │
+              ▼                                ▼
+<span class="green">┌─────────────────────────────────────────────────────────────────────────┐</span>
+<span class="green">│</span>                      <span class="highlight">ETL PIPELINE (TRANSFORM)</span>                           <span class="green">│</span>
+<span class="green">├─────────────────────────────────────────────────────────────────────────┤</span>
+<span class="green">│</span>  • Batch processing (50K records/batch)                                 <span class="green">│</span>
+<span class="green">│</span>  • Sport inference for orphaned assets (<span class="purple">161,588 recovered</span>)              <span class="green">│</span>
+<span class="green">│</span>  • User → Country mapping via postal codes                              <span class="green">│</span>
+<span class="green">│</span>  • Vectorized operations + hashmap lookups                              <span class="green">│</span>
+<span class="green">└─────────────────────────────────────────────────────────────────────────┘</span>
+              │
+              ▼
+<span class="highlight">┌─────────────────────────────────────────────────────────────────────────┐</span>
+<span class="highlight">│</span>                    <span class="yellow">STAR SCHEMA DATAMART (LOAD)</span>                          <span class="highlight">│</span>
+<span class="highlight">├─────────────────────────────────────────────────────────────────────────┤</span>
+<span class="highlight">│</span>                                                                         <span class="highlight">│</span>
+<span class="highlight">│</span>   ┌─────────────┐    ┌─────────────────────────┐    ┌─────────────┐     <span class="highlight">│</span>
+<span class="highlight">│</span>   │  <span class="green">dim_date</span>   │───▶│  <span class="purple">fact_streaming_summary</span> │◀───│ <span class="green">dim_country</span> │     <span class="highlight">│</span>
+<span class="highlight">│</span>   │ 1,752 days  │    │     (PARTITIONED)       │    │ 4 countries │     <span class="highlight">│</span>
+<span class="highlight">│</span>   └─────────────┘    └─────────────────────────┘    └─────────────┘     <span class="highlight">│</span>
+<span class="highlight">│</span>                                                                         <span class="highlight">│</span>
+<span class="highlight">│</span>                    MySQL 8.0 on Aiven Cloud                             <span class="highlight">│</span>
+<span class="highlight">└─────────────────────────────────────────────────────────────────────────┘</span>
+                </pre>
+            </div>
+        </section>
+
+        <!-- Data Pipeline Section -->
+        <section>
+            <h2>🔄 Data Pipeline</h2>
+            <div class="data-flow">
+                <div class="flow-card">
+                    <div class="icon">📥</div>
+                    <h3>Extract</h3>
+                    <p>Pull streaming transactions from SQLite operational database and CSV exports from web/app
+                        clients.</p>
+                    <div class="metric">1,181,863 source records</div>
+                </div>
+                <div class="flow-card">
+                    <div class="icon">⚙️</div>
+                    <h3>Transform</h3>
+                    <p>Map users to countries, infer sports from asset prefixes, aggregate daily metrics, handle
+                        orphaned records.</p>
+                    <div class="metric">161,588 records recovered</div>
+                </div>
+                <div class="flow-card">
+                    <div class="icon">📤</div>
+                    <h3>Load</h3>
+                    <p>Bulk insert into partitioned fact tables with ON DUPLICATE KEY UPDATE for idempotent loads.</p>
+                    <div class="metric">~51 seconds total</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Star Schema Section -->
+        <section>
+            <h2>⭐ Star Schema</h2>
+            <div class="schema-grid">
+                <div class="schema-card">
+                    <h3>fact_streaming_summary <span>Partitioned</span></h3>
+                    <ul>
+                        <li>date_id <span class="type">INT (PK)</span></li>
+                        <li>country_id <span class="type">INT (PK)</span></li>
+                        <li>sport_name <span class="type">VARCHAR (PK)</span></li>
+                        <li>transaction_count <span class="type">INT</span></li>
+                        <li>unique_user_count <span class="type">INT</span></li>
+                        <li>total_minutes_streamed <span class="type">INT</span></li>
+                        <li>completed_streams <span class="type">INT</span></li>
+                        <li>avg_minutes_per_stream <span class="type">DECIMAL</span></li>
+                    </ul>
+                </div>
+                <div class="schema-card">
+                    <h3>dim_date <span>1,752 rows</span></h3>
+                    <ul>
+                        <li>date_id <span class="type">INT (PK)</span></li>
+                        <li>full_date <span class="type">DATE</span></li>
+                        <li>year <span class="type">INT</span></li>
+                        <li>quarter <span class="type">INT</span></li>
+                        <li>month <span class="type">INT</span></li>
+                        <li>week <span class="type">INT</span></li>
+                        <li>day_of_week <span class="type">INT</span></li>
+                    </ul>
+                </div>
+                <div class="schema-card">
+                    <h3>dim_country <span>4 rows</span></h3>
+                    <ul>
+                        <li>country_id <span class="type">INT (PK)</span></li>
+                        <li>country_name <span class="type">VARCHAR</span></li>
+                    </ul>
+                </div>
+                <div class="schema-card">
+                    <h3>dim_sport <span>3 rows</span></h3>
+                    <ul>
+                        <li>sport_id <span class="type">INT (PK)</span></li>
+                        <li>sport_name <span class="type">VARCHAR</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Preview -->
+        <section>
+            <h2>📈 Sample Analytics</h2>
+            <div class="analytics-preview">
+                <div class="analytics-card">
+                    <h4>Streaming by Sport</h4>
+                    <table>
+                        <tr>
+                            <th>Sport</th>
+                            <th>Streams</th>
+                            <th>Share</th>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td>Ice Hockey</td>
+                            <td>687,234</td>
+                            <td>59.9%</td>
+                        </tr>
+                        <tr>
+                            <td>Ski Jumping</td>
+                            <td>298,451</td>
+                            <td>26.0%</td>
+                        </tr>
+                        <tr>
+                            <td>Inline Hockey</td>
+                            <td>161,994</td>
+                            <td>14.1%</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="analytics-card">
+                    <h4>Top Markets</h4>
+                    <table>
+                        <tr>
+                            <th>Country</th>
+                            <th>Streams</th>
+                            <th>Share</th>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td>Deutschland</td>
+                            <td>687,234</td>
+                            <td>59.9%</td>
+                        </tr>
+                        <tr>
+                            <td>Österreich</td>
+                            <td>245,891</td>
+                            <td>21.4%</td>
+                        </tr>
+                        <tr>
+                            <td>Schweiz</td>
+                            <td>156,432</td>
+                            <td>13.6%</td>
+                        </tr>
+                        <tr>
+                            <td>Liechtenstein</td>
+                            <td>58,122</td>
+                            <td>5.1%</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Features -->
+        <section>
+            <h2>✨ Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>📊 Table Partitioning</h3>
+                    <p>Yearly range partitions on fact table for efficient date-range query pruning and improved
+                        performance.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔍 Sport Inference</h3>
+                    <p>Pattern-matching algorithm recovers 161,588 orphaned records by inferring sport from asset ID
+                        prefixes.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚡ Optimized ETL</h3>
+                    <p>Vectorized operations, hashmap lookups, and bulk inserts achieve 23K records/second throughput.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <h3>📈 Pre-computed Metrics</h3>
+                    <p>Daily aggregations with pre-calculated averages enable sub-100ms analytical query response times.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack -->
+        <section>
+            <h2>🛠️ Tech Stack</h2>
+            <div class="tech-grid">
+                <div class="tech-item">MySQL 8.0</div>
+                <div class="tech-item">SQLite</div>
+                <div class="tech-item">R 4.3+</div>
+                <div class="tech-item">RMySQL</div>
+                <div class="tech-item">RSQLite</div>
+                <div class="tech-item">DBI</div>
+                <div class="tech-item">R Markdown</div>
+                <div class="tech-item">kableExtra</div>
+                <div class="tech-item">Aiven Cloud</div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>
+                Built by <strong>Ayush Varma</strong> • MS Computer Science, Northeastern University
+            </p>
+            <div class="social-links">
+                <a href="https://github.com/ayushvarma7">GitHub</a>
+                <a href="https://linkedin.com/in/ayushvarma7">LinkedIn</a>
+                <a href="https://twitter.com/patchgalactic">Twitter</a>
+                <a href="https://ayushvarma7.substack.com">Substack</a>
+            </div>
+            <p style="margin-top: 20px; font-size: 0.85rem;">
+                CS5200 Database Management Systems • Fall 2025
+            </p>
+        </footer>
+    </div>
+</body>
+
+</html>
